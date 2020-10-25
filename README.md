@@ -25,6 +25,6 @@ INFO:     Application startup complete.
 ```
 
 ## With Docker
-```
+```bash
 $ docker-compose up
 ```
