@@ -20,3 +20,4 @@ pip-selfcheck.json
 # Changes
 .mypy_cache
 __pycache__
+src/airline.db

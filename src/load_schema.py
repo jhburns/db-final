@@ -11,15 +11,13 @@ def create_connection(db_file: str) -> Optional[sqlite3.Connection]:
     :param db_file: database file
     :return: Connection object or None
     """
-
-    connection = None
     try:
         connection = sqlite3.connect(db_file)
         return connection
     except Error as e:
+        print("Error! creating connection failed.")
         print(e)
-
-    return connection
+        return None
 
 
 def create_tables(connection: sqlite3.Connection, create_table_sql: str):
@@ -28,23 +26,26 @@ def create_tables(connection: sqlite3.Connection, create_table_sql: str):
     :param create_table_sql: an SQL script
     :return:
     """
-    try:
-        cursor = connection.cursor()
-        cursor.executescript(create_table_sql)
-    except Error as e:
-        print("Error! cannot create tables.")
-        print(e)
+    cursor = connection.cursor()
+    cursor.executescript(create_table_sql)
+    connection.commit()
 
 
-def initialize_db():
-    connection = create_connection(":memory:")
+def initialize_db() -> Optional[sqlite3.Connection]:
+    connection = create_connection("./airline.db")
 
     if connection is not None:
-        # create tables
-        path = "./burns_schema.sql"
-        sql_file = open(path, 'r')
-        sql = sql_file.read()
-        create_tables(connection, sql)
-    else:
-        print("Error! cannot create the database connection.")
+        try:
+            # read sql statments
+            path = "./burns_schema.sql"
+            sql_file = open(path, 'r')
 
+            # create tables
+            sql = sql_file.read()
+            create_tables(connection, sql)
+        except Error as e:
+            print("Error! cannot create tables.")
+            print(e)
+            return None
+
+    return connection
