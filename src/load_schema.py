@@ -32,6 +32,7 @@ def create_tables(connection: sqlite3.Connection, create_table_sql: str):
         cursor = connection.cursor()
         cursor.executescript(create_table_sql)
     except Error as e:
+        print("Error! cannot create tables.")
         print(e)
 
 
@@ -40,7 +41,7 @@ def initialize_db():
 
     if connection is not None:
         # create tables
-        path = r"./burns_schema.sql"
+        path = "./burns_schema.sql"
         sql_file = open(path, 'r')
         sql = sql_file.read()
         create_tables(connection, sql)

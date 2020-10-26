@@ -19,16 +19,15 @@ CREATE TABLE inventory (
 );
 
 CREATE TABLE flights (
-	date TEXT NOT NULL PRIMARY KEY,
-	origin TEXT NOT NULL,
-	destination TEXT NOT NULL,
-	plane_id INTEGER NOT NULL,
-	FOREIGN KEY(plane_id) REFERENCES planes(serial_number)
+	flight_id INTEGER NOT NULL PRIMARY KEY,
+	date TEXT NOT NULL,
+	i_id INTEGER NOT NULL,
+	FOREIGN KEY(i_id) REFERENCES planes(inventory_id)
 );
 
 CREATE TABLE passengers (
 	passenger_id INTEGER NOT NULL,
-	plane_id INTEGER NOT NULL,
+	f_id INTEGER NOT NULL,
 	FOREIGN KEY(passenger_id) REFERENCES customers(customer_id),
-	FOREIGN KEY(plane_id) REFERENCES planes(serial_number)
+	FOREIGN KEY(f_id) REFERENCES flights(flight_id)
 );
