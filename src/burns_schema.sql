@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS planes (
 	serial_number TEXT PRIMARY KEY,
 	seat_count_row INTEGER NOT NULL,
 	seat_count_column INTEGER NOT NULL,
-	max_weight_kg INTEGER NOT NULL
+	max_load_kg INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS inventory (
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS inventory (
 
 CREATE TABLE IF NOT EXISTS flights (
 	flight_id INTEGER NOT NULL PRIMARY KEY,
-	date TEXT NOT NULL,
+	departure_datetime TEXT NOT NULL,
 	i_id INTEGER NOT NULL,
 	FOREIGN KEY(i_id) REFERENCES planes(inventory_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

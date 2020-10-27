@@ -22,7 +22,7 @@ def create_connection(db_file: str) -> Optional[sqlite3.Connection]:
 
 def create_tables(connection: sqlite3.Connection, create_table_sql: str):
     """ create tables
-    :param conn: Connection object
+    :param connection: Connection object
     :param create_table_sql: an SQL script
     :return:
     """
