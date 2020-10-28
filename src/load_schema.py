@@ -20,7 +20,9 @@ def create_connection(db_file: str) -> Optional[sqlite3.Connection]:
         return None
 
 
-def create_tables(connection: sqlite3.Connection, create_table_sql: str):
+def create_tables(
+        connection: sqlite3.Connection, create_table_sql: str
+        ) -> None:
     """ create tables
     :param connection: Connection object
     :param create_table_sql: an SQL script
@@ -36,7 +38,7 @@ def initialize_db() -> Optional[sqlite3.Connection]:
 
     if connection is not None:
         try:
-            # read sql statments
+            # read sql statements
             path = "./burns_schema.sql"
             sql_file = open(path, 'r')
 

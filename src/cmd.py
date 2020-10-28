@@ -1,4 +1,7 @@
 import load_schema
+import models
+import actions
+from typing import cast
 
 print("Welcome to the airline manager 2000")
 connection = load_schema.initialize_db()
@@ -8,5 +11,11 @@ if connection is None:
 else:
     print("Connected to the database file: airline.db")
     print()
+
+    table = models.tables["customers"]
+    key = table[0]
+    sql = actions.generate_delete("customers", cast(models.PrimaryKey, key))
+
+    actions.execute(connection, sql, [1])
 
     connection.close()

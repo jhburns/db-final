@@ -1,10 +1,21 @@
-from typing import List, Union
+from typing import List, Union, Tuple, Iterable
 from pytypes import is_of_type  # type: ignore
 import models
+import sqlite3
+
+
+def execute(
+        connection: sqlite3.Connection,
+        sql: str,
+        data: List[Union[str, int]],
+) -> None:
+    current = connection.cursor()
+    current.execute(sql, data)
+    connection.commit()
 
 
 def prompt_insert(
-        attributes: models.SchemaTypes
+        attributes: models.SchemaTypes,
 ) -> List[Union[str, int]]:
     """
     Ask for a value for each column
@@ -13,7 +24,8 @@ def prompt_insert(
     row: List[Union[str, int]] = []
 
     for a in attributes:
-        if is_of_type(a, models.Attribute[str]):
+        if (is_of_type(a, models.Attribute[str])
+                or is_of_type(a, models.PrimaryKey[str])):
             messsage = "Please enter a {} (string): "
             print(messsage.format(a.display_name), end='')
             row.append(input())
@@ -40,3 +52,34 @@ def prompt_insert(
                 print("Try again")
 
     return row
+
+
+def generate_insert(
+        table_name: str,
+        schema: models.SchemaTypes,
+) -> str:
+    """
+    Generate the sql for inserting a record into the given table
+    :param table_name:
+    :param schema:
+    :return:
+    """
+    return ''' INSERT INTO {}({})
+        VALUES({}) '''.format(
+            table_name,
+            ", ".join(map(lambda a: a.identifier, schema)),
+            ("?, " * len(schema))[:-2])
+
+
+def generate_delete(
+        table_name: str,
+        schema: models.PrimaryTypes
+) -> str:
+    """
+    Generate the sql for by primary key
+    :param table_name:
+    :param schema:
+    :return:
+    """
+    return ''' DELETE FROM {} WHERE {}=? '''.format(
+        table_name, schema.identifier)
