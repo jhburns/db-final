@@ -95,5 +95,3 @@ def remove_primary_int(schema: SchemaTypes) -> SchemaTypes:
             new_schema.append(s)
 
     return new_schema
-
-
