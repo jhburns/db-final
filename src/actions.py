@@ -13,6 +13,17 @@ def execute(
     connection.commit()
 
 
+def fetch(
+        connection: sqlite3.Connection,
+        sql: str,
+        data: List[Union[str, int]],
+) -> str:
+    current = connection.cursor()
+    current.execute(sql, data)
+
+    return str(current.fetchone()[0])
+
+
 def prompt_insert(
         attributes: models.SchemaTypes,
 ) -> List[Union[str, int]]:
@@ -29,7 +40,7 @@ def prompt_insert(
             row.append(input())
         elif a.ty is int:
             while True:
-                messsage = "Please enter a {} (positive integer): "
+                messsage = "Please enter a {} (integer): "
                 print(messsage.format(a.display_name), end='')
 
                 try:
@@ -59,8 +70,8 @@ def generate_insert(
     """
     Generate the sql for inserting a record into the given table
     :param table_name: table being inserted into
-    :param schema: 
-    :return: 
+    :param schema:
+    :return:
     """
     return ''' INSERT INTO {}({})
         VALUES({}) '''.format(
@@ -95,5 +106,21 @@ class CustomQuery:
 
 
 custom_queries = [
-    CustomQuery("", "b", None),
+    CustomQuery("SELECT AVG(weight_kg) FROM customers",
+                "Find the average weight of customers.", None),
+    CustomQuery('''select MAX(plane_id), plane_id from (SELECT COUNT(plane_id),
+                 plane_id FROM inventory GROUP BY plane_id)''',
+                '''Find the serial number and count of the most type of planes
+                 in inventory''',
+                None),
+    CustomQuery("SELECT plane_id, count() from inventory group by plane_id",
+                "Find the most common type of plane in inventory.", None),
+    CustomQuery('''SELECT (seat_count_row * seat_count_column) < (select COUNT(*)
+                 from passengers where f_id=?) from flights, inventory, planes
+                where flight_id=?''',
+                "Find whether a flight is not full.", "Flight id (integer)"),
+    CustomQuery('''SELECT max_load_kg < (select COUNT(*) from passengers where
+                 f_id=?) from flights, inventory, planes where flight_id=?''',
+                "Find whether a flight is over its maximum weight.",
+                "Flight id (integer)")
 ]

@@ -1,7 +1,6 @@
 import load_schema
 import models
 import actions
-from typing import cast
 
 print("Welcome to the airline manager 2000")
 connection = load_schema.initialize_db()

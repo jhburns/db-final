@@ -29,7 +29,7 @@ tables: Mapping[str, SchemaTypes] = {
         Attribute("serial_number", "serial number", True, str),
         Attribute("seat_count_row", "seat count in a row", False, int),
         Attribute("seat_count_column",
-                       "seat count in a column", False, int),
+                  "seat count in a column", False, int),
         Attribute("max_load_kg", "maximum load, kg", False, int),
     ],
 
@@ -41,7 +41,7 @@ tables: Mapping[str, SchemaTypes] = {
     "flights": [
         Attribute("flight_id", "flight ID", True, int),
         Attribute("departure_datetime",
-                       "seat count in a row", False, str),
+                  "seat count in a row", False, str),
         Attribute("i_id", "seat count in a column", False, int),
     ],
 
