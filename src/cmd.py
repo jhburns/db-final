@@ -14,7 +14,7 @@ else:
 
     table = models.tables["customers"]
     key = table[0]
-    sql = actions.generate_delete("customers", cast(models.PrimaryKey, key))
+    sql = actions.generate_delete("customers", key)
 
     actions.execute(connection, sql, [1])
 

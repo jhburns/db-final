@@ -7,9 +7,9 @@ from typing import Optional
 
 def create_connection(db_file: str) -> Optional[sqlite3.Connection]:
     """ create a database connection to the SQLite database
-        specified by db_file
+    specified by db_file
     :param db_file: database file
-    :return: Connection object or None
+    :return: connection object if it succeeds
     """
     try:
         connection = sqlite3.connect(db_file)
@@ -24,7 +24,7 @@ def create_tables(
         connection: sqlite3.Connection, create_table_sql: str
         ) -> None:
     """ create tables
-    :param connection: Connection object
+    :param connection: connection object
     :param create_table_sql: an SQL script
     :return:
     """

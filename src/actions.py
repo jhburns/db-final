@@ -1,5 +1,4 @@
 from typing import List, Union, Optional
-from pytypes import is_of_type  # type: ignore
 import models
 import sqlite3
 
@@ -24,12 +23,11 @@ def prompt_insert(
     row: List[Union[str, int]] = []
 
     for a in attributes:
-        if (is_of_type(a, models.Attribute[str])
-                or is_of_type(a, models.PrimaryKey[str])):
+        if a.ty is str:
             messsage = "Please enter a {} (string): "
             print(messsage.format(a.display_name), end='')
             row.append(input())
-        elif is_of_type(a, models.Attribute[int]):
+        elif a.ty is int:
             while True:
                 messsage = "Please enter a {} (positive integer): "
                 print(messsage.format(a.display_name), end='')
@@ -60,9 +58,9 @@ def generate_insert(
 ) -> str:
     """
     Generate the sql for inserting a record into the given table
-    :param table_name:
-    :param schema:
-    :return:
+    :param table_name: table being inserted into
+    :param schema: 
+    :return: 
     """
     return ''' INSERT INTO {}({})
         VALUES({}) '''.format(
@@ -73,11 +71,11 @@ def generate_insert(
 
 def generate_delete(
         table_name: str,
-        schema: models.PrimaryTypes
+        schema: models.Attribute
 ) -> str:
     """
     Generate the sql for by primary key
-    :param table_name:
+    :param table_name: table being deleted from
     :param schema:
     :return:
     """
