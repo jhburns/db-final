@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 from pytypes import is_of_type  # type: ignore
 import models
 import sqlite3
@@ -83,3 +83,19 @@ def generate_delete(
     """
     return ''' DELETE FROM {} WHERE {}=? '''.format(
         table_name, schema.identifier)
+
+
+class CustomQuery:
+    sql: str
+    description: str
+    prompt: Optional[str]
+
+    def __init__(self, s, d, p) -> None:
+        self.sql = s
+        self.description = d
+        self.prompt = p
+
+
+custom_queries = [
+    CustomQuery("", "b", None),
+]
