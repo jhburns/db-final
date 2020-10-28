@@ -1,4 +1,5 @@
 PRAGMA strict=ON;
+PRAGMA foreign_keys=ON;
 
 CREATE TABLE IF NOT EXISTS customers (
 	customer_id INTEGER PRIMARY KEY,

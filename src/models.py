@@ -1,4 +1,4 @@
-from typing import List, Union, Mapping, Iterable, Type
+from typing import List, Mapping, Iterable, Type
 
 
 class Attribute():
@@ -15,7 +15,7 @@ class Attribute():
 
 
 # Schemas
-SchemaTypes = List[Union[Attribute]]
+SchemaTypes = List[Attribute]
 
 tables: Mapping[str, SchemaTypes] = {
     "customers": [
@@ -41,8 +41,8 @@ tables: Mapping[str, SchemaTypes] = {
     "flights": [
         Attribute("flight_id", "flight ID", True, int),
         Attribute("departure_datetime",
-                  "seat count in a row", False, str),
-        Attribute("i_id", "seat count in a column", False, int),
+                  "the departure date", False, str),
+        Attribute("i_id", "plane ID", False, int),
     ],
 
     "passengers": [
@@ -52,19 +52,6 @@ tables: Mapping[str, SchemaTypes] = {
 }
 
 
-def iter_row(data: List[Union[str, int]]) -> Iterable[str]:
-    row: List[str] = []
-
-    for d in data:
-        if isinstance(d, str):
-            row.append(d)
-        elif isinstance(d, int):
-            row.append(str(d))
-
-    return iter(row)
-
-
-# Casts required because mypy can't understand the proper types
 def remove_primary_int(schema: SchemaTypes) -> SchemaTypes:
     new_schema: SchemaTypes = []
 
