@@ -1,13 +1,26 @@
-from typing import List, Mapping, Type
+from typing import List, Mapping, Type, Dict
 
 
 class Attribute():
+    """ Schema definition for a column in SQL
+
+        Attributes
+        ----------
+        identifier
+            The SQL identifier.
+        display_name
+            The text to display when prompting for this value.
+        is_primary
+            If true, this attribute is a primary key.
+        ty
+            The type of the attribute, str or int only.
+    """
     identifier: str
     display_name: str
     is_primary: bool
-    ty = Type
+    ty: Type
 
-    def __init__(self, i, d, p, t) -> None:
+    def __init__(self, i: str, d: str, p: bool, t: Type) -> None:
         self.identifier = i
         self.display_name = d
         self.is_primary = p
@@ -53,6 +66,18 @@ tables: Mapping[str, SchemaTypes] = {
 
 
 def remove_primary_int(schema: SchemaTypes) -> SchemaTypes:
+    """ Remove any primary, int type attribute from a schema.
+        Because those are set automatically by sqlite.
+
+        Parameters
+        ----------
+        schema
+            The schema to alter.
+
+        Returns
+        -------
+        Schema without primary, int attributes.
+    """
     new_schema: SchemaTypes = []
 
     for s in schema:
@@ -62,3 +87,27 @@ def remove_primary_int(schema: SchemaTypes) -> SchemaTypes:
             new_schema.append(s)
 
     return new_schema
+
+
+def primary_only(
+    tables: Mapping[str, SchemaTypes]
+) -> Dict[str, Attribute]:
+    """ Remove any non primary key.
+
+        Parameters
+        ----------
+        tables
+            A description of all table schemas.
+
+        Returns
+        -------
+        Tables without primary keys.
+    """
+    primary_only: Dict[str, Attribute] = {}
+
+    for (name, attributes) in tables.items():
+        for a in attributes:
+            if a.is_primary:
+                primary_only[name] = a
+
+    return primary_only

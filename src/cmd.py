@@ -1,19 +1,41 @@
-from typing import List, Union, Mapping, Dict, Optional, Tuple
+from typing import List, Union, Optional, Tuple
 from load_schema import initialize_db
-from models import SchemaTypes, Attribute, tables, remove_primary_int
+from models import SchemaTypes, tables, remove_primary_int, primary_only
 from actions import (
     execute, generate_delete,
-    generate_insert, custom_queries, fetch
+    generate_insert, custom_queries, fetch,
 )
 
 
 def prompt_str(content: str) -> str:
-    messsage = "\tPlease enter a {} (string): "
+    """ Ask the user for a string.
+
+        Parameters
+        ----------
+        content
+            The description of what is being prompted.
+
+        Returns
+        -------
+        The user's input.
+    """
+    messsage = "\tPlease enter the {} (string): "
     print(messsage.format(content), end='')
     return input()
 
 
 def prompt_int(content: str) -> int:
+    """ Ask the user for an integer.
+
+        Parameters
+        ----------
+        content
+            The description of what is being prompted.
+
+        Returns
+        -------
+        The user's input.
+    """
     while True:
         messsage = "\tPlease enter the {} (integer): "
         print(messsage.format(content), end='')
@@ -36,9 +58,16 @@ def prompt_int(content: str) -> int:
 def prompt_insert(
         attributes: SchemaTypes,
 ) -> List[Union[str, int]]:
-    """
-    Ask for a value for each column
-    :param attributes: The schema of the table being inserted into
+    """ Ask for a value of each column.
+
+        Parameters
+        ----------
+        attributes
+            The schema of an table.
+
+        Returns
+        -------
+        The user's input.
     """
     row: List[Union[str, int]] = []
 
@@ -49,19 +78,6 @@ def prompt_insert(
             row.append(prompt_int(a.display_name))
 
     return row
-
-
-def primary_only(
-    tables: Mapping[str, SchemaTypes]
-) -> Dict[str, Attribute]:
-    primary_only: Dict[str, Attribute] = {}
-
-    for (name, attributes) in tables.items():
-        for a in attributes:
-            if a.is_primary:
-                primary_only[name] = a
-
-    return primary_only
 
 
 print("Welcome to the airline manager 20000")
@@ -93,14 +109,14 @@ else:
 
                 table_name = list(tables.keys())[choice2]
                 schema = tables[table_name]
-                responce1 = tuple(prompt_insert(schema))
+                response1 = tuple(prompt_insert(schema))
 
                 execute(
                     connection,
                     generate_insert(
                         table_name,
                         remove_primary_int(schema)),
-                    responce1)
+                    response1)
             elif choice == 2:
                 print("Choose a table to delete from.")
 
@@ -116,18 +132,18 @@ else:
                 table_name = list(primaries.keys())[choice2]
                 attribute = primaries[table_name]
 
-                responce2: Tuple[Union[str, int]]
+                response2: Tuple[Union[str, int]]
                 if attribute.ty is str:
                     respone = prompt_str(attribute.display_name)
                 elif attribute.ty is int:
-                    responce2 = (prompt_int(attribute.display_name),)
+                    response2 = (prompt_int(attribute.display_name),)
 
                 execute(
                     connection,
                     generate_delete(
                         table_name,
                         attribute),
-                    responce2)
+                    response2)
             elif choice == 3:
                 print("Choose a predefined query.")
 
@@ -141,15 +157,15 @@ else:
 
                 action = custom_queries[choice2]
 
-                responce3: Optional[Tuple[int, int]] = None
+                response3: Optional[Tuple[int, int]] = None
                 if action.prompt is not None:
                     mes = int(input("\t{}: ".format(action.prompt)))
-                    responce3 = (mes, mes)
+                    response3 = (mes, mes)
 
                 result = fetch(
                     connection,
                     action.sql,
-                    responce3)
+                    response3)
                 print("\tQuery result: {}".format(result))
             elif choice == 4:
                 print("Quitting...")

@@ -5,10 +5,16 @@ from typing import Optional
 
 
 def create_connection(db_file: str) -> Optional[Connection]:
-    """ create a database connection to the SQLite database
-    specified by db_file
-    :param db_file: database file
-    :return: connection object if it succeeds
+    """ Create a database connection to the SQLite database specified by db_file.
+
+        Parameters
+        ----------
+        db_file
+            The file to connect to.
+
+        Returns
+        -------
+        A connection, if it was possible.
     """
     try:
         connection = connect(db_file)
@@ -19,18 +25,28 @@ def create_connection(db_file: str) -> Optional[Connection]:
         return None
 
 
-def create_tables(connection: Connection, create_table_sql: str) -> None:
-    """ create tables
-    :param connection: connection object
-    :param create_table_sql: an SQL script
-    :return:
+def create_tables(connection: Connection, create_tables_sql: str) -> None:
+    """ Execute an SQL script in order to make tables if they don't already exist.
+
+        Parameters
+        ----------
+        connection
+            The database to create tables in.
+        create_tables_sql
+            The script to run.
     """
     cursor = connection.cursor()
-    cursor.executescript(create_table_sql)
+    cursor.executescript(create_tables_sql)
     connection.commit()
 
 
 def initialize_db() -> Optional[Connection]:
+    """ Create a connection to the database and create tables in it.
+
+        Returns
+        -------
+        A connection, if initialization was successful.
+    """
     connection = create_connection("./airline.db")
 
     if connection is not None:

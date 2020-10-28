@@ -8,6 +8,16 @@ def execute(
         sql: str,
         data: Tuple[Union[str, int], ...],
 ) -> None:
+    """
+        Parameters
+        ----------
+        connection
+            The database to query.
+        sql
+            Prepared SQL, single statement.
+        data
+            Matching the prepared SQL.
+    """
     current = connection.cursor()
     current.execute(sql, data)
     connection.commit()
@@ -18,6 +28,21 @@ def fetch(
         sql: str,
         data: Optional[Tuple[int, int]],
 ) -> str:
+    """ Select data from sqlite.
+
+        Parameters
+        ----------
+        connection
+            The database to query.
+        sql
+            Prepared SQL, using select.
+        data
+            Matching the prepared SQL.
+
+        Returns
+        -------
+        The query response.
+    """
     current = connection.cursor()
 
     if data is None:
@@ -25,18 +50,28 @@ def fetch(
     else:
         current.execute(sql, data)
 
-    return str(current.fetchone()[0])
+    response = current.fetchone()
+    print(str(response))
+
+    return str(response[0])
 
 
 def generate_insert(
         table_name: str,
         schema: SchemaTypes,
 ) -> str:
-    """
-    Generate the sql for inserting a record into the given table
-    :param table_name: table being inserted into
-    :param schema:
-    :return:
+    """ Generate the sql for inserting a record into the given table.
+
+        Parameters
+        ----------
+        table_name
+            The table to insert into.
+        schema
+            The keys being used to insert.
+
+        Returns
+        -------
+        An insert in SQL.
     """
     return ''' INSERT INTO {}({})
         VALUES({}) '''.format(
@@ -49,22 +84,40 @@ def generate_delete(
         table_name: str,
         schema: Attribute
 ) -> str:
-    """
-    Generate the sql for by primary key
-    :param table_name: table being deleted from
-    :param schema:
-    :return:
+    """ Generate the sql by primary key.
+
+        Parameters
+        ----------
+        table_name
+            The table to delete from.
+        schema
+            The primary key of the row to delete.
+
+        Returns
+        -------
+        A delete in SQL.
     """
     return ''' DELETE FROM {} WHERE {}=? '''.format(
         table_name, schema.identifier)
 
 
 class CustomQuery:
+    """ Make a built-in query.
+
+        Attributes
+        ----------
+        sql
+            The query.
+        description
+            Information presented to the user.
+        prompt
+            Optional, prompt the user to supply data.
+    """
     sql: str
     description: str
     prompt: Optional[str]
 
-    def __init__(self, s, d, p) -> None:
+    def __init__(self, s: str, d: str, p: Optional[str]) -> None:
         self.sql = s
         self.description = d
         self.prompt = p
