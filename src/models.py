@@ -1,4 +1,4 @@
-from typing import List, Mapping, Iterable, Type
+from typing import List, Mapping, Type
 
 
 class Attribute():

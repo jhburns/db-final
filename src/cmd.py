@@ -1,4 +1,4 @@
-from typing import List, Union, Mapping, Dict
+from typing import List, Union, Mapping, Dict, Optional, Tuple
 import load_schema
 import models
 import actions
@@ -90,14 +90,14 @@ else:
 
                 table_name = list(models.tables.keys())[choice2]
                 schema = models.tables[table_name]
-                responce = tuple(prompt_insert(schema))
+                responce1 = tuple(prompt_insert(schema))
 
                 actions.execute(
                     connection,
                     actions.generate_insert(
                         table_name,
                         models.remove_primary_int(schema)),
-                    responce)
+                    responce1)
             elif choice == 2:
                 print("Choose a table to delete from.")
 
@@ -108,8 +108,46 @@ else:
                 choice2 = int(input("\tYour choice: "))
                 if choice2 < 0 or choice2 > len(primaries) - 1:
                     raise ValueError
+                print()
+
+                table_name = list(primaries.keys())[choice2]
+                attribute = primaries[table_name]
+
+                responce2: Tuple[Union[str, int]]
+                if attribute.ty is str:
+                    respone = prompt_str(attribute.display_name)
+                elif attribute.ty is int:
+                    responce2 = (prompt_int(attribute.display_name),)
+
+                actions.execute(
+                    connection,
+                    actions.generate_delete(
+                        table_name,
+                        attribute),
+                    responce2)
             elif choice == 3:
                 print("Choose a predefined query.")
+
+                for (i, q) in enumerate(actions.custom_queries):
+                    print("\t{}. {}".format(i, q.description))
+
+                choice2 = int(input("\tYour choice: "))
+                if choice2 < 0 or choice2 > len(actions.custom_queries) - 1:
+                    raise ValueError
+                print()
+
+                action = actions.custom_queries[choice2]
+
+                responce3: Optional[Tuple[int, int]] = None
+                if action.prompt is not None:
+                    mes = int(input("\t{}: ".format(action.prompt)))
+                    responce3 = (mes, mes)
+
+                result = actions.fetch(
+                    connection,
+                    action.sql,
+                    responce3)
+                print("\tQuery result: {}".format(result))
             elif choice == 4:
                 print("Quitting...")
                 break
@@ -119,10 +157,11 @@ else:
             print("\t--Done!--")
             print()
         except ValueError:
-            print("Error! Try again, input a number in the correct range.")
+            print("Error! Try again, input the proper type.")
             print()
         except Exception as e:
             print("Error! " + str(e))
             print("An error unexpected has occurred, try again.")
+            print()
 
     connection.close()

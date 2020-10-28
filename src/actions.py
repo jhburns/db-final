@@ -1,4 +1,4 @@
-from typing import List, Union, Optional, Tuple
+from typing import Union, Optional, Tuple
 import models
 import sqlite3
 
@@ -16,10 +16,14 @@ def execute(
 def fetch(
         connection: sqlite3.Connection,
         sql: str,
-        data: List[Union[str, int]],
+        data: Optional[Tuple[int, int]],
 ) -> str:
     current = connection.cursor()
-    current.execute(sql, data)
+
+    if data is None:
+        current.execute(sql)
+    else:
+        current.execute(sql, data)
 
     return str(current.fetchone()[0])
 
@@ -72,7 +76,7 @@ custom_queries = [
     CustomQuery('''SELECT MAX(plane_id), plane_id FROM (SELECT COUNT(plane_id),
                  plane_id FROM inventory GROUP BY plane_id)''',
                 '''Find the serial number and count of the most type of planes
-                 in inventory''',
+           in inventory.''',
                 None),
     CustomQuery("SELECT plane_id, count() FROM inventory GROUP BY plane_id",
                 "Find the most common type of plane in inventory.", None),
