@@ -1,18 +1,17 @@
 # Modified from: https://www.sqlitetutorial.net/sqlite-python/create-tables/
 
-import sqlite3
-from sqlite3 import Error
+from sqlite3 import Error, connect, Connection
 from typing import Optional
 
 
-def create_connection(db_file: str) -> Optional[sqlite3.Connection]:
+def create_connection(db_file: str) -> Optional[Connection]:
     """ create a database connection to the SQLite database
     specified by db_file
     :param db_file: database file
     :return: connection object if it succeeds
     """
     try:
-        connection = sqlite3.connect(db_file)
+        connection = connect(db_file)
         return connection
     except Error as e:
         print("Error! creating connection failed.")
@@ -20,9 +19,7 @@ def create_connection(db_file: str) -> Optional[sqlite3.Connection]:
         return None
 
 
-def create_tables(
-        connection: sqlite3.Connection, create_table_sql: str
-) -> None:
+def create_tables(connection: Connection, create_table_sql: str) -> None:
     """ create tables
     :param connection: connection object
     :param create_table_sql: an SQL script
@@ -33,7 +30,7 @@ def create_tables(
     connection.commit()
 
 
-def initialize_db() -> Optional[sqlite3.Connection]:
+def initialize_db() -> Optional[Connection]:
     connection = create_connection("./airline.db")
 
     if connection is not None:

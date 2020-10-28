@@ -1,6 +1,6 @@
 from typing import Union, Optional, Tuple
-import models
 import sqlite3
+from models import SchemaTypes, Attribute
 
 
 def execute(
@@ -30,7 +30,7 @@ def fetch(
 
 def generate_insert(
         table_name: str,
-        schema: models.SchemaTypes,
+        schema: SchemaTypes,
 ) -> str:
     """
     Generate the sql for inserting a record into the given table
@@ -47,7 +47,7 @@ def generate_insert(
 
 def generate_delete(
         table_name: str,
-        schema: models.Attribute
+        schema: Attribute
 ) -> str:
     """
     Generate the sql for by primary key

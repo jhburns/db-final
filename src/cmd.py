@@ -1,7 +1,10 @@
 from typing import List, Union, Mapping, Dict, Optional, Tuple
-import load_schema
-import models
-import actions
+from load_schema import initialize_db
+from models import SchemaTypes, Attribute, tables, remove_primary_int
+from actions import (
+    execute, generate_delete,
+    generate_insert, custom_queries, fetch
+)
 
 
 def prompt_str(content: str) -> str:
@@ -31,7 +34,7 @@ def prompt_int(content: str) -> int:
 
 
 def prompt_insert(
-        attributes: models.SchemaTypes,
+        attributes: SchemaTypes,
 ) -> List[Union[str, int]]:
     """
     Ask for a value for each column
@@ -49,9 +52,9 @@ def prompt_insert(
 
 
 def primary_only(
-    tables: Mapping[str, models.SchemaTypes]
-) -> Dict[str, models.Attribute]:
-    primary_only: Dict[str, models.Attribute] = {}
+    tables: Mapping[str, SchemaTypes]
+) -> Dict[str, Attribute]:
+    primary_only: Dict[str, Attribute] = {}
 
     for (name, attributes) in tables.items():
         for a in attributes:
@@ -62,7 +65,7 @@ def primary_only(
 
 
 print("Welcome to the airline manager 20000")
-connection = load_schema.initialize_db()
+connection = initialize_db()
 
 if connection is None:
     print("Error! initializing the db failed. Exiting.")
@@ -80,28 +83,28 @@ else:
 
             if choice == 1:
                 print("Choose a table to insert into.")
-                for (i, table) in enumerate(models.tables):
+                for (i, table) in enumerate(tables):
                     print("\t{}. {}".format(i, table))
 
                 choice2 = int(input("\tYour choice: "))
-                if choice2 < 0 or choice2 > len(models.tables) - 1:
+                if choice2 < 0 or choice2 > len(tables) - 1:
                     raise ValueError
                 print()
 
-                table_name = list(models.tables.keys())[choice2]
-                schema = models.tables[table_name]
+                table_name = list(tables.keys())[choice2]
+                schema = tables[table_name]
                 responce1 = tuple(prompt_insert(schema))
 
-                actions.execute(
+                execute(
                     connection,
-                    actions.generate_insert(
+                    generate_insert(
                         table_name,
-                        models.remove_primary_int(schema)),
+                        remove_primary_int(schema)),
                     responce1)
             elif choice == 2:
                 print("Choose a table to delete from.")
 
-                primaries = primary_only(models.tables)
+                primaries = primary_only(tables)
                 for (i, table) in enumerate(primaries):
                     print("\t{}. {}".format(i, table))
 
@@ -119,31 +122,31 @@ else:
                 elif attribute.ty is int:
                     responce2 = (prompt_int(attribute.display_name),)
 
-                actions.execute(
+                execute(
                     connection,
-                    actions.generate_delete(
+                    generate_delete(
                         table_name,
                         attribute),
                     responce2)
             elif choice == 3:
                 print("Choose a predefined query.")
 
-                for (i, q) in enumerate(actions.custom_queries):
+                for (i, q) in enumerate(custom_queries):
                     print("\t{}. {}".format(i, q.description))
 
                 choice2 = int(input("\tYour choice: "))
-                if choice2 < 0 or choice2 > len(actions.custom_queries) - 1:
+                if choice2 < 0 or choice2 > len(custom_queries) - 1:
                     raise ValueError
                 print()
 
-                action = actions.custom_queries[choice2]
+                action = custom_queries[choice2]
 
                 responce3: Optional[Tuple[int, int]] = None
                 if action.prompt is not None:
                     mes = int(input("\t{}: ".format(action.prompt)))
                     responce3 = (mes, mes)
 
-                result = actions.fetch(
+                result = fetch(
                     connection,
                     action.sql,
                     responce3)
