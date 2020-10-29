@@ -47,9 +47,9 @@ def prompt_int(content: str) -> int:
 
             return user_input
         except ValueError:
-            print("\tError: {} was not an integer.".format(messsage))
+            print("\tError: {} was not an integer.".format(content))
         except TypeError:
-            print("\tError: {} was not positive.".format(messsage))
+            print("\tError: {} was not positive.".format(content))
 
         print()
         print("\tTry again")

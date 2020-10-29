@@ -54,12 +54,15 @@ def fetch(
         current.execute(sql, data)
 
     response = current.fetchone()
+    if response is None:
+        return str(None)
+
+    response = response[0]
+
     if is_bool_responce:
         return str(bool(response))
 
-    print(str(response))
-
-    return str(response[0])
+    return str(response)
 
 
 def generate_insert(
@@ -137,15 +140,22 @@ custom_queries = [
                 '''Find the serial number of the most common type of plane
            in inventory.''',
                 None),
-    CustomQuery('''SELECT AVG(max_load_kg) FROM planes, inventory;''',
+    CustomQuery('''SELECT AVG(max_load_kg) FROM planes JOIN inventory
+                 ON plane_id=serial_number;''',
                 "Find the (weighted) average max load across the fleet.",
                 None),
-    CustomQuery('''SELECT (seat_count_row * seat_count_column) > (SELECT COUNT(*)
-                 FROM passengers WHERE f_id=?) FROM flights, inventory, planes
-                WHERE flight_id=?;''',
-                "Find whether a flight is full.", "Flight id (integer)"),
-    CustomQuery('''SELECT max_load_kg < (SELECT COUNT(*) FROM passengers WHERE
-                 f_id=?) FROM flights, inventory, planes WHERE flight_id=?';''',
+    CustomQuery('''SELECT (seat_count_row * seat_count_column) <=
+                    (SELECT COUNT(*) FROM passengers WHERE f_id=?)
+                    FROM flights JOIN inventory JOIN planes ON
+                    plane_id=serial_number AND i_id=inventory_id WHERE
+                    flight_id=?;''',
+                "Find whether a flight is full or overbooked.",
+                "Flight id (integer)"),
+    CustomQuery('''SELECT max_load_kg <= (SELECT SUM(weight_kg) FROM
+                    passengers JOIN customers ON passenger_id=customer_id
+                    WHERE f_id=?) FROM flights JOIN inventory
+                    JOIN planes ON plane_id=serial_number
+                    AND i_id=inventory_id WHERE flight_id=?;''',
                 "Find whether a flight is over its maximum weight.",
                 "Flight id (integer)")
 ]
