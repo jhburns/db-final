@@ -27,6 +27,7 @@ def fetch(
         connection: sqlite3.Connection,
         sql: str,
         data: Optional[Tuple[int, int]],
+        is_bool_responce: bool
 ) -> str:
     """ Select data from sqlite.
 
@@ -38,6 +39,8 @@ def fetch(
             Prepared SQL, using select.
         data
             Matching the prepared SQL.
+        is_bool_responce
+            If true, cast the responce to a boolean.
 
         Returns
         -------
@@ -51,6 +54,9 @@ def fetch(
         current.execute(sql, data)
 
     response = current.fetchone()
+    if is_bool_responce:
+        return str(bool(response))
+
     print(str(response))
 
     return str(response[0])
@@ -126,19 +132,20 @@ class CustomQuery:
 custom_queries = [
     CustomQuery("SELECT AVG(weight_kg) FROM customers",
                 "Find the average weight of customers.", None),
-    CustomQuery('''SELECT MAX(plane_id), plane_id FROM (SELECT COUNT(plane_id),
-                 plane_id FROM inventory GROUP BY plane_id)''',
-                '''Find the serial number and count of the most type of planes
+    CustomQuery('''SELECT plane_id, MAX(c) FROM (SELECT COUNT(plane_id) as c,
+                 plane_id FROM inventory GROUP BY plane_id);''',
+                '''Find the serial number of the most common type of plane
            in inventory.''',
                 None),
-    CustomQuery("SELECT plane_id, count() FROM inventory GROUP BY plane_id",
-                "Find the most common type of plane in inventory.", None),
-    CustomQuery('''SELECT (seat_count_row * seat_count_column) < (SELECT COUNT(*)
+    CustomQuery('''SELECT AVG(max_load_kg) FROM planes, inventory;''',
+                "Find the (weighted) average max load across the fleet.",
+                None),
+    CustomQuery('''SELECT (seat_count_row * seat_count_column) > (SELECT COUNT(*)
                  FROM passengers WHERE f_id=?) FROM flights, inventory, planes
-                WHERE flight_id=?''',
-                "Find whether a flight is not full.", "Flight id (integer)"),
+                WHERE flight_id=?;''',
+                "Find whether a flight is full.", "Flight id (integer)"),
     CustomQuery('''SELECT max_load_kg < (SELECT COUNT(*) FROM passengers WHERE
-                 f_id=?) FROM flights, inventory, planes WHERE flight_id=?''',
+                 f_id=?) FROM flights, inventory, planes WHERE flight_id=?';''',
                 "Find whether a flight is over its maximum weight.",
                 "Flight id (integer)")
 ]

@@ -156,16 +156,19 @@ else:
                 print()
 
                 action = custom_queries[choice2]
+                is_bool_responce = False
 
                 response3: Optional[Tuple[int, int]] = None
                 if action.prompt is not None:
                     mes = int(input("\t{}: ".format(action.prompt)))
                     response3 = (mes, mes)
+                    is_bool_responce = True
 
                 result = fetch(
                     connection,
                     action.sql,
-                    response3)
+                    response3,
+                    is_bool_responce)
                 print("\tQuery result: {}".format(result))
             elif choice == 4:
                 print("Quitting...")

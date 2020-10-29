@@ -48,14 +48,14 @@ tables: Mapping[str, SchemaTypes] = {
 
     "inventory": [
         Attribute("inventory_id", "inventory ID", True, int),
-        Attribute("plane_id", "plane ID", False, int),
+        Attribute("plane_id", "plane ID", False, str),
     ],
 
     "flights": [
         Attribute("flight_id", "flight ID", True, int),
         Attribute("departure_datetime",
                   "the departure date", False, str),
-        Attribute("i_id", "plane ID", False, int),
+        Attribute("i_id", "inventory ID", False, int),
     ],
 
     "passengers": [
